@@ -130,7 +130,6 @@ export default class LwcScheduler extends LightningElement {
         this.currentCronAsString = `0 ${minute} ${hour} ? * * *`;
 
     }
-
     /**
      * The stopLoading utility is used to control a consistant state experience for the user - it ensures that 
      * we don't have a flickering spinner effect when the state is in flux.
