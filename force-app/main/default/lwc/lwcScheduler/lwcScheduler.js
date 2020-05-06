@@ -1,4 +1,4 @@
-import { LightningElement } from 'lwc';
+import { LightningElement, track } from 'lwc';
 import getCurrentlyScheduledCron from '@salesforce/apex/LWCSchedulingService.getCurrentlyScheduleCron';
 import runFirstJob from '@salesforce/apex/LWCSchedulingService.runFirstJob';
 import checkFirstJobStatus from '@salesforce/apex/LWCSchedulingService.checkFirstJobStatus';
@@ -9,14 +9,15 @@ export default class LwcScheduler extends LightningElement {
 
     cronJobName = 'Create Daily Account Record';
     methodName = 'createAccountRecord';
-    currentCronAsTime;
+    @track currentCronAsTime;
+    currentCronAsString;
     state; // test, schedule, reschedule
     loading;
 
     connectedCallback(){
 
-        loading = true;
-
+        this.loading = true;
+        this.getScheduledCron();
     }
 
     /**
@@ -24,7 +25,7 @@ export default class LwcScheduler extends LightningElement {
      * scheduled - we can modify the state appropriatley.
      */
 
-    getCurrentlyScheduledCron() {
+    getScheduledCron() {
         getCurrentlyScheduledCron({cronJobName : this.cronJobName}).then(result => {
             switch(result){
                 case 'test':
@@ -35,22 +36,21 @@ export default class LwcScheduler extends LightningElement {
                 break;
                 default:
                 this.currentCronAsTime = this.convertCronToTime(result);
+                console.log('Job Scheduled for: ' + this.currentCronAsTime);
                 this.state = 'reschedule';
             }
             this.stopLoading(100);
         }).catch(error => {
 
             this.stopLoading(100);
-            this.showUIMessage('Error', error.message, 'error', 'utility:error', 'inverse');
 
         })
     }
 
     convertCronToTime(result){
         let cronArray = result.split(' ');
-        [hour, minute, second] = cronArray;
-        return '${hour}:${minute}:${second}.000';
-
+        let [second, minute, hour] = cronArray;
+        return `${hour}:${minute}:00.000`;
     }
 
     runFirstJob() {
@@ -62,7 +62,6 @@ export default class LwcScheduler extends LightningElement {
     }
 
     checkFirstJobStatus() {
-        //this.hideUIMessage();
         checkFirstJobStatus({submittedDatetime: this.dateTimeSubmitted, methodName: this.methodName}).then(result => {
             switch(result){
                 case 'Completed':
@@ -83,14 +82,14 @@ export default class LwcScheduler extends LightningElement {
         })
     }
 
-    scheduleJob() {
-        scheduleJob({cronString: this.currentCron, cronJobName: this.cronJobName}).then(data => {
+    scheduleApexJob() {
+        scheduleJob({cronString: this.currentCronAsString, cronJobName: this.cronJobName}).then(data => {
 
             console.log(data);
 
             if (data) {
                 this.state = 'reschedule';
-                this.getCurrentlyScheduledCron();
+                this.getScheduledCron();
             } else {
                 this.stopLoading(100);
                 console.log('Unable to Schedule Job');
@@ -102,19 +101,20 @@ export default class LwcScheduler extends LightningElement {
         })
     }
 
-    deleteScheduledJob() {
-        deleteScheduledJob({}).then(data => {
+    deleteJob() {
+        deleteScheduledJob({cronJobName: this.cronJobName}).then(data => {
 
             console.log(data);
 
             if (data) {
                 this.state = 'schedule';
-                this.currentCronAsTime;
+                this.currentCronAsTime = '';
                 this.stopLoading(100);
+                console.log('Job Deleted');
 
             } else {
                 this.stopLoading(100);
-                console.log('we were unable to schedule this sync');
+                console.log('we were unable to delete this job');
             }
 
         }).catch(error => {
@@ -123,7 +123,13 @@ export default class LwcScheduler extends LightningElement {
         })
     }
 
+    handleTimeChange(event){
 
+        let time = event.target.value;
+        let [hour, minute, seconds] = time.split(':');
+        this.currentCronAsString = `0 ${minute} ${hour} ? * * *`;
+
+    }
 
     /**
      * The stopLoading utility is used to control a consistant state experience for the user - it ensures that 

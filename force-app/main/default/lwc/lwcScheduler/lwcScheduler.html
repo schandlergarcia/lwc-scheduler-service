@@ -1,3 +1,32 @@
 <template>
-    
+  <div class="slds-grid slds-wrap">
+    <div class="slds-size_1-of-1">
+      <lightning-card title="Schedule Apex" icon-name="standard:apex">
+        <lightning-button-icon icon-name="utility:refresh" slot="actions" name="refresh" onclick={getScheduledCron}></lightning-button-icon>
+        <div class="slds-grid slds-wrap slds-var-p-right_medium slds-var-p-left_medium slds-var-p-bottom_medium">
+          <div class="slds-size_1-of-1 slds-var-p-bottom_x-small slds-var-p-top_x-small">
+            <h2 class="slds-text-heading_small">Schedule Job</h2>
+          </div>
+          <div class="slds-size_1-of-1 slds-var-p-bottom_x-small slds-var-p-top_x-small">
+            <lightning-input type="time" name="time" label="When would you like to schedule the sync" required
+              value="00:00:00.000Z" onchange={handleTimeChange}></lightning-input>
+          </div>
+          <div class="slds-size_1-of-1 slds-var-p-bottom_x-small slds-var-p-top_x-small slds-border_bottom">
+            <lightning-button label="Schedule Job" name="Schedule Job" onclick={scheduleApexJob}></lightning-button>
+          </div>
+          <div class="slds-size_1-of-1 slds-var-p-bottom_x-small slds-var-p-top_small">
+            <h2 class="slds-text-heading_small">Currently Scheduled Job</h2>
+          </div>
+          <div class="slds-size_1-of-1 slds-var-p-bottom_x-small slds-var-p-top_x-small">
+            <p>The job is currently scheduled for: <lightning-formatted-time class="slds-var-p-left_xx-small"
+                value={currentCronAsTime}></lightning-formatted-time>
+            </p>
+          </div>
+          <div class="slds-size_1-of-1 slds-var-p-bottom_x-small slds-var-p-top_x-small">
+            <lightning-button label="Delete Job" name="Delete Job" onclick={deleteJob}></lightning-button>
+          </div>
+        </div>
+      </lightning-card>
+    </div>
+  </div>
 </template>
