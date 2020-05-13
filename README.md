@@ -4,8 +4,8 @@ Recently, I was building a Salesforce Labs App that required me to enable a user
 
 ## Solution Overview
 
-...
+Coming soon
 
 ### Getting Started
 
-...
+Coming soon
