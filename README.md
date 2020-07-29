@@ -27,10 +27,10 @@ The app demonstrates:
    cd communities-social-navigation
    ```
 
-1. Create a scratch org and provide it with an alias (**ebikes** in the command below):
+1. Create a scratch org and provide it with an alias (**lwc-scheduler** in the command below):
 
    ```
-   sfdx force:org:create -s -f config/project-scratch-def.json -a communities-navigation
+   sfdx force:org:create -s -f config/project-scratch-def.json -a lwc-scheduler
    ```
 
 1. Push the app to your scratch org:
