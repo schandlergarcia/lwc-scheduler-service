@@ -23,8 +23,8 @@ The app demonstrates:
 1. Clone the repository:
 
    ```
-   git clone https://github.com/schandlergarcia/communities-social-navigation
-   cd communities-social-navigation
+   git clone https://github.com/schandlergarcia/lwc-scheduler-service
+   cd lwc-scheduler-service
    ```
 
 1. Create a scratch org and provide it with an alias (**lwc-scheduler** in the command below):
