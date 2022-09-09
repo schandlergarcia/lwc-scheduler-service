@@ -12,6 +12,7 @@ export default class LwcScheduler extends LightningElement {
   currentCronAsString;
   state; // test, schedule, reschedule
   loading;
+  dateTimeSubmitted;
 
   connectedCallback() {
     this.loading = true;
@@ -53,9 +54,10 @@ export default class LwcScheduler extends LightningElement {
 
   runFirstJob() {
     this.loading = true;
+    this.dateTimeSubmitted = new Date().toJSON();
     runFirstJob({})
       .then(data => {
-        this.checkFirstSecurityJobStatus();
+        this.checkFirstJobStatus();
       })
       .catch(error => {
         this.stopLoading(500);
@@ -67,11 +69,11 @@ export default class LwcScheduler extends LightningElement {
       submittedDatetime: this.dateTimeSubmitted,
       methodName: this.methodName
     })
-      .then(result => {
-        switch (result) {
+      .then(data => {
+        switch (data?.Status) {
           case "Completed":
             this.state = "schedule";
-            this.stopLoading;
+            this.stopLoading(500);
             break;
           case ("Aborted", "Failed"):
             this.stopLoading(500);
@@ -138,9 +140,9 @@ export default class LwcScheduler extends LightningElement {
     this.currentCronAsString = `0 ${minute} ${hour} ? * * *`;
   }
   /**
-   * The stopLoading utility is used to control a consistant state experience for the user - it ensures that
+   * The stopLoading utility is used to control a consistent state experience for the user - it ensures that
    * we don't have a flickering spinner effect when the state is in flux.
-   * @param {timeoutValue} timeoutValue
+   * @param {number} timeoutValue
    */
 
   stopLoading(timeoutValue) {
